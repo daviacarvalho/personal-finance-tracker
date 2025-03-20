@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  categories   Category[]
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+}
+
+model Category {
+  id           Int           @id @default(autoincrement())
+  name         String
+  user         User          @relation(fields: [userId], references: [id])
+  userId       Int
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+}
+
+model Transaction {
+  id         Int             @id @default(autoincrement())
+  title      String
+  amount     Decimal
+  type       TransactionType
+  user       User            @relation(fields: [userId], references: [id])
+  userId     Int
+  category   Category?       @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+  date       DateTime
+  createdAt  DateTime        @default(now())
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
